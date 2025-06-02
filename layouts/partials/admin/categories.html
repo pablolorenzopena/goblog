@@ -1,0 +1,135 @@
+<div class="box">
+    <h3 class="title is-4">Gestión de Categorías</h3>
+    
+    <!-- Lista de categorías actuales -->
+    <div class="tags are-medium mb-4">
+        {{ range $key, $taxonomy := .Site.Taxonomies }}
+            {{ if eq $key "categories" }}
+                {{ range $name, $pages := $taxonomy }}
+                <span class="tag is-info">
+                    {{ $name }}
+                    <span class="tag is-light ml-2">{{ len $pages }}</span>
+                    <button class="delete is-small ml-2" onclick="deleteCategory('{{ $name }}')"></button>
+                </span>
+                {{ end }}
+            {{ end }}
+        {{ end }}
+    </div>
+
+    <!-- Formulario para agregar nueva categoría -->
+    <div class="field has-addons">
+        <div class="control is-expanded">
+            <input class="input" type="text" id="newCategory" placeholder="Nueva categoría">
+        </div>
+        <div class="control">
+            <button class="button is-info" onclick="addCategory()">
+                <span class="icon">
+                    <i class="fas fa-plus"></i>
+                </span>
+                <span>Agregar</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabla de posts por categoría -->
+    <div class="content mt-6">
+        <h4 class="title is-5">Posts por Categoría</h4>
+        <table class="table is-fullwidth">
+            <thead>
+                <tr>
+                    <th>Categoría</th>
+                    <th>Posts</th>
+                    <th>Última actualización</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range $key, $taxonomy := .Site.Taxonomies }}
+                    {{ if eq $key "categories" }}
+                        {{ range $name, $pages := $taxonomy }}
+                        <tr>
+                            <td>{{ $name }}</td>
+                            <td>{{ len $pages }}</td>
+                            <td>
+                                {{ with index $pages 0 }}
+                                    {{ .Date.Format "02/01/2006" }}
+                                {{ end }}
+                            </td>
+                        </tr>
+                        {{ end }}
+                    {{ end }}
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function addCategory() {
+    const input = document.getElementById('newCategory');
+    const category = input.value.trim();
+    
+    if (!category) {
+        alert('Por favor ingresa un nombre para la categoría');
+        return;
+    }
+    
+    fetch(`${window.adminConfig.apiEndpoint}/categories`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ name: category })
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Error al crear la categoría');
+        return response.json();
+    })
+    .then(() => {
+        alert('Categoría creada correctamente');
+        window.location.reload();
+    })
+    .catch(error => {
+        alert('Error: ' + error.message);
+    });
+
+    input.value = '';
+}
+
+function deleteCategory(name) {
+    if (!confirm(`¿Estás seguro de que quieres eliminar la categoría "${name}"? Esto no eliminará los posts asociados.`)) return;
+    
+    fetch(`${window.adminConfig.apiEndpoint}/categories/${name}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Error al eliminar la categoría');
+        return response.json();
+    })
+    .then(() => {
+        alert('Categoría eliminada correctamente');
+        window.location.reload();
+    })
+    .catch(error => {
+        alert('Error: ' + error.message);
+    });
+}
+</script>
+
+<style>
+.tags .tag {
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.tag .delete {
+    margin-left: 0.5rem;
+}
+
+.tag .tag {
+    margin: 0 0 0 0.5rem;
+}
+</style> 

@@ -1,0 +1,27 @@
+# Etapa 1: build del binario Go
+FROM golang:1.20-alpine AS builder
+
+ENV CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64
+
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+WORKDIR /src/cmd/sync
+RUN go build -o /bin/sync .
+
+# Etapa 2: imagen mínima con el binario
+FROM alpine:3.18
+RUN apk add --no-cache ca-certificates bash
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+COPY --from=builder /bin/sync /usr/local/bin/sync
+
+ENV CONTENTFUL_SPACE_ID="" \
+    CONTENTFUL_ACCESS_TOKEN="" \
+    OUTPUT_DIR="/workspace/content/posts"
+
+WORKDIR /workspace
+ENTRYPOINT ["sync"]
+CMD ["--help"] 

@@ -1,0 +1,48 @@
+<div class="box">
+    <h3 class="title is-4">Biblioteca Multimedia</h3>
+    <div class="file has-name is-boxed">
+        <label class="file-label">
+            <input class="file-input" type="file" name="media" id="mediaUpload" multiple>
+            <span class="file-cta">
+                <span class="file-icon">
+                    <i class="fas fa-upload"></i>
+                </span>
+                <span class="file-label">
+                    Subir archivo
+                </span>
+            </span>
+        </label>
+    </div>
+    <div id="mediaGallery" class="columns is-multiline mt-4">
+        {{ $mediaPath := "static/media" }}
+        {{ if (fileExists $mediaPath) }}
+            {{ range (readDir $mediaPath) }}
+            <div class="column is-3">
+                <div class="card">
+                    <div class="card-image">
+                        <figure class="image is-4by3">
+                            <img src="/media/{{ .Name }}" alt="{{ .Name }}">
+                        </figure>
+                    </div>
+                    <div class="card-content">
+                        <div class="content">
+                            <p class="is-size-7">{{ .Name }}</p>
+                            <button class="button is-danger is-small" onclick="deleteMedia('{{ .Name }}')">
+                                <span class="icon"><i class="fas fa-trash"></i></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{ end }}
+        {{ else }}
+            <div class="column is-12">
+                <article class="message is-info">
+                    <div class="message-body">
+                        No hay archivos multimedia todavía. Usa el botón de arriba para subir algunos.
+                    </div>
+                </article>
+            </div>
+        {{ end }}
+    </div>
+</div> 

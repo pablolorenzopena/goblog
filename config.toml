@@ -1,0 +1,85 @@
+# Configuración básica
+baseURL = "http://localhost:1313"
+languageCode = "es-es"
+title = "Mi Blog"
+
+# Configuración de secciones
+[permalinks]
+  posts = "/:year/:month/:slug/"
+  admin = "/admin/"
+
+# Menú de navegación
+[menu]
+  [[menu.main]]
+    name = "Inicio"
+    url = "/"
+    weight = 1
+  [[menu.main]]
+    name = "Artículos"
+    url = "/posts/"
+    weight = 2
+  [[menu.main]]
+    name = "Sobre Mí"
+    url = "/about/"
+    weight = 3
+
+# Parámetros personalizados
+[params]
+  description = "Mi blog personal"
+  author = "Tu Nombre"
+  mainSections = ["posts"]
+  
+# Taxonomías
+[taxonomies]
+  category = "categories"
+  tag = "tags"
+
+# Configuración de seguridad para admin
+[security]
+  [security.funcs]
+    getenv = ['^HUGO_', '^CI$']
+
+[markup]
+  [markup.highlight]
+    style = "dracula"
+
+# Configuración específica para la administración
+[outputFormats]
+  [outputFormats.Admin]
+    mediaType = "text/html"
+    path = "admin"
+    baseName = "index"
+    isPlainText = true
+    isHTML = true
+    permalinkable = true
+
+[outputs]
+  home = ["HTML", "RSS"]
+  section = ["HTML"]
+  page = ["HTML"]
+  admin = ["Admin"]
+
+[module]
+  [[module.mounts]]
+    source = "content"
+    target = "content"
+  [[module.mounts]]
+    source = "static"
+    target = "static"
+  [[module.mounts]]
+    source = "layouts"
+    target = "layouts"
+  [[module.mounts]]
+    source = "data"
+    target = "data"
+
+[server]
+  [[server.headers]]
+    for = "/admin/*"
+    [server.headers.values]
+      X-Frame-Options = "DENY"
+      X-XSS-Protection = "1; mode=block"
+      X-Content-Type-Options = "nosniff"
+      Content-Security-Policy = "default-src 'self' 'unsafe-inline' 'unsafe-eval' https:; img-src 'self' https: data:;"
+
+paginate = 5 

@@ -1,0 +1,66 @@
+{{ define "main" }}
+<div class="content">
+    <div class="columns">
+        <div class="column is-3">
+            <aside class="menu">
+                <p class="menu-label">
+                    Temáticas
+                </p>
+                <ul class="menu-list">
+                    {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
+                    <li>
+                        <a href="{{ "/tags/" | relLangURL }}{{ $name | urlize }}" 
+                           class="{{ if eq $.Title $name }}is-active{{ end }}">
+                            {{ $name }} ({{ $taxonomy.Count }})
+                        </a>
+                    </li>
+                    {{ end }}
+                </ul>
+            </aside>
+        </div>
+
+        <div class="column">
+            <h1 class="title is-1">
+                Artículos sobre "{{ .Title }}"
+                <span class="tag is-info is-medium">{{ len .Pages }} artículos</span>
+            </h1>
+
+            <div class="columns is-multiline">
+                {{ range .Pages }}
+                <div class="column is-one-third">
+                    <div class="card">
+                        {{ with .Params.featureImage }}
+                        <div class="card-image">
+                            <figure class="image is-16by9">
+                                <img src="{{ . }}" alt="{{ $.Title }}">
+                            </figure>
+                        </div>
+                        {{ end }}
+                        
+                        <div class="card-content">
+                            <div class="content">
+                                <h2 class="title is-4">
+                                    <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                                </h2>
+                                <p class="subtitle is-6">
+                                    <time datetime="{{ .Date.Format "2006-01-02" }}">
+                                        {{ .Date.Format "2 Jan, 2006" }}
+                                    </time>
+                                </p>
+                                {{ with .Params.tags }}
+                                <div class="tags">
+                                    {{ range . }}
+                                    <span class="tag is-info is-light">{{ . }}</span>
+                                    {{ end }}
+                                </div>
+                                {{ end }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{ end }}
+            </div>
+        </div>
+    </div>
+</div>
+{{ end }} 

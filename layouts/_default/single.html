@@ -1,0 +1,177 @@
+{{ define "main" }}
+<article class="section article-single">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-8">
+                <!-- Cabecera del artículo -->
+                <header class="article-header">
+                    {{ with .Params.tags }}
+                    <div class="tags are-medium mb-4">
+                        {{ range . }}
+                        <a href="{{ "/tags/" | relLangURL }}{{ . | urlize }}" class="tag is-info is-light">
+                            {{ . }}
+                        </a>
+                        {{ end }}
+                    </div>
+                    {{ end }}
+
+                    <h1 class="title is-1 mb-4">{{ .Title }}</h1>
+
+                    <div class="article-meta mb-6">
+                        <div class="level">
+                            <div class="level-left">
+                                <div class="level-item">
+                                    <span class="icon-text">
+                                        <span class="icon"><i class="far fa-calendar"></i></span>
+                                        <time datetime="{{ .Date.Format "2006-01-02" }}">
+                                            {{ .Date.Format "2 Jan, 2006" }}
+                                        </time>
+                                    </span>
+                                </div>
+                                <div class="level-item">
+                                    <span class="icon-text">
+                                        <span class="icon"><i class="far fa-clock"></i></span>
+                                        <span>{{ math.Round (div (countwords .Content) 200.0) }} min lectura</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Imagen destacada -->
+                {{ with .Params.featureImage }}
+                <figure class="image is-16by9 mb-6">
+                    <img src="{{ . }}" alt="{{ $.Title }}" class="has-shadow">
+                </figure>
+                {{ end }}
+
+                <!-- Contenido del artículo -->
+                <div class="content article-content">
+                    {{ .Content }}
+                </div>
+
+                <!-- Compartir -->
+                <div class="article-share has-text-centered mt-6">
+                    <p class="is-size-5 mb-4">¿Te ha resultado útil? ¡Compártelo!</p>
+                    <div class="buttons is-centered">
+                        <a href="https://twitter.com/intent/tweet?text={{ .Title }}&url={{ .Permalink }}" 
+                           target="_blank" 
+                           class="button is-twitter">
+                            <span class="icon"><i class="fab fa-twitter"></i></span>
+                            <span>Twitter</span>
+                        </a>
+                        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ .Permalink }}&title={{ .Title }}" 
+                           target="_blank" 
+                           class="button is-linkedin">
+                            <span class="icon"><i class="fab fa-linkedin"></i></span>
+                            <span>LinkedIn</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Navegación entre posts -->
+                <nav class="article-nav mt-6">
+                    <div class="level">
+                        <div class="level-left">
+                            {{ with .PrevInSection }}
+                            <a href="{{ .RelPermalink }}" class="level-item button is-light">
+                                <span class="icon"><i class="fas fa-arrow-left"></i></span>
+                                <span>Anterior</span>
+                            </a>
+                            {{ end }}
+                        </div>
+                        <div class="level-right">
+                            {{ with .NextInSection }}
+                            <a href="{{ .RelPermalink }}" class="level-item button is-light">
+                                <span>Siguiente</span>
+                                <span class="icon"><i class="fas fa-arrow-right"></i></span>
+                            </a>
+                            {{ end }}
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- Artículos relacionados -->
+                {{ $related := .Site.RegularPages.Related . | first 3 }}
+                {{ with $related }}
+                <div class="related-posts mt-6">
+                    <h3 class="title is-4">Artículos Relacionados</h3>
+                    <div class="columns">
+                        {{ range . }}
+                        <div class="column is-4">
+                            <div class="card">
+                                {{ with .Params.featureImage }}
+                                <div class="card-image">
+                                    <figure class="image is-16by9">
+                                        <img src="{{ . }}" alt="{{ $.Title }}">
+                                    </figure>
+                                </div>
+                                {{ end }}
+                                <div class="card-content">
+                                    <p class="title is-5">
+                                        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+                {{ end }}
+
+                <!-- Sistema de comentarios -->
+                <div class="comments-section mt-6">
+                    <h3 class="title is-4">Comentarios</h3>
+                    <div id="disqus_thread"></div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="column is-3 is-hidden-mobile">
+                <div class="sidebar">
+                    <!-- Newsletter -->
+                    <div class="box newsletter-box">
+                        <h4 class="title is-5">¡Suscríbete!</h4>
+                        <p class="mb-4">Recibe los últimos artículos en tu correo</p>
+                        <form action="/subscribe" method="post">
+                            <div class="field">
+                                <div class="control">
+                                    <input class="input" type="email" placeholder="Tu email" required>
+                                </div>
+                            </div>
+                            <button class="button is-info is-fullwidth">Suscribirse</button>
+                        </form>
+                    </div>
+
+                    <!-- Tags populares -->
+                    <div class="box">
+                        <h4 class="title is-5">Tags Populares</h4>
+                        <div class="tags">
+                            {{ range first 10 .Site.Taxonomies.tags.ByCount }}
+                            <a href="{{ "/tags/" | relLangURL }}{{ .Name | urlize }}" class="tag">
+                                {{ .Name }} ({{ .Count }})
+                            </a>
+                            {{ end }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- Script de Disqus -->
+<script>
+var disqus_config = function () {
+    this.page.url = '{{ .Permalink }}';
+    this.page.identifier = '{{ .File.UniqueID }}';
+};
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://TU-SHORTNAME-DISQUS.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+</script>
+{{ end }} 

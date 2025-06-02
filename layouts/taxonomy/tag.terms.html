@@ -1,0 +1,30 @@
+{{ define "main" }}
+<div class="content">
+    <h1 class="title is-1">Todas las Temáticas</h1>
+    
+    <div class="columns is-multiline">
+        {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
+        {{ $count := $taxonomy.Count }}
+        <div class="column is-one-third">
+            <div class="card">
+                <div class="card-content">
+                    <div class="content">
+                        <h2 class="title is-4">
+                            <a href="{{ "/tags/" | relLangURL }}{{ $name | urlize }}">
+                                {{ $name }}
+                            </a>
+                        </h2>
+                        <p class="subtitle">
+                            {{ $count }} artículo{{ if gt $count 1 }}s{{ end }}
+                        </p>
+                        <div class="tags">
+                            <span class="tag is-info is-medium">{{ $name }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+</div>
+{{ end }} 

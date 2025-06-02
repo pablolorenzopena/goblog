@@ -1,0 +1,33 @@
+<div class="box">
+    <h3 class="title is-4">Borradores</h3>
+    <table class="table is-fullwidth">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Última modificación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range where .Site.RegularPages "Draft" true }}
+            <tr>
+                <td>{{ .Title }}</td>
+                <td>{{ .Lastmod.Format "02/01/2006" }}</td>
+                <td>
+                    <div class="buttons are-small">
+                        <button class="button is-info" onclick="editPost('{{ .File.Path }}')">
+                            <span class="icon"><i class="fas fa-edit"></i></span>
+                        </button>
+                        <button class="button is-success" onclick="publishPost('{{ .File.Path }}')">
+                            <span class="icon"><i class="fas fa-check"></i></span>
+                        </button>
+                        <button class="button is-danger" onclick="deletePost('{{ .File.Path }}')">
+                            <span class="icon"><i class="fas fa-trash"></i></span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</div> 

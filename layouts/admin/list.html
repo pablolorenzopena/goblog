@@ -1,0 +1,301 @@
+{{ define "main" }}
+<div class="section admin-dashboard">
+    <div class="container">
+        <!-- Header -->
+        <header class="admin-header mb-6">
+            <div class="level">
+                <div class="level-left">
+                    <h1 class="title is-2">Panel de Administración</h1>
+                </div>
+                <div class="level-right">
+                    <button class="button is-primary" id="newPostBtn">
+                        <span class="icon"><i class="fas fa-plus"></i></span>
+                        <span>Nuevo Artículo</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Grid -->
+        <div class="columns">
+            <!-- Sidebar -->
+            <div class="column is-3">
+                <aside class="menu">
+                    <p class="menu-label">General</p>
+                    <ul class="menu-list">
+                        <li><a class="is-active" href="#posts">Artículos</a></li>
+                        <li><a href="#drafts">Borradores</a></li>
+                        <li><a href="#ideas">Ideas</a></li>
+                    </ul>
+                    
+                    <p class="menu-label">Contenido</p>
+                    <ul class="menu-list">
+                        <li><a href="#categories">Categorías</a></li>
+                        <li><a href="#media">Multimedia</a></li>
+                    </ul>
+
+                    <p class="menu-label">Configuración</p>
+                    <ul class="menu-list">
+                        <li><a href="#profile">Perfil</a></li>
+                        <li><a href="#settings">Ajustes</a></li>
+                    </ul>
+                </aside>
+            </div>
+
+            <!-- Main Content -->
+            <div class="column is-9">
+                <!-- Quick Stats -->
+                <div class="columns is-multiline">
+                    <div class="column is-4">
+                        <div class="box has-background-primary has-text-white">
+                            <p class="heading has-text-white">Artículos Publicados</p>
+                            <p class="title has-text-white">{{ len (where .Site.RegularPages "Section" "posts") }}</p>
+                        </div>
+                    </div>
+                    <div class="column is-4">
+                        <div class="box has-background-info has-text-white">
+                            <p class="heading has-text-white">Borradores</p>
+                            <p class="title has-text-white">{{ len (where .Site.RegularPages "Draft" true) }}</p>
+                        </div>
+                    </div>
+                    <div class="column is-4">
+                        <div class="box has-background-success has-text-white">
+                            <p class="heading has-text-white">Total Categorías</p>
+                            <p class="title has-text-white">{{ len .Site.Taxonomies.categories }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Sections -->
+                <div id="posts" class="content-section">
+                    {{ partial "admin/posts-list.html" . }}
+                </div>
+                <div id="drafts" class="content-section is-hidden">
+                    {{ partial "admin/drafts-list.html" . }}
+                </div>
+                <div id="ideas" class="content-section is-hidden">
+                    {{ partial "admin/ideas.html" . }}
+                </div>
+                <div id="categories" class="content-section is-hidden">
+                    {{ partial "admin/categories.html" . }}
+                </div>
+                <div id="media" class="content-section is-hidden">
+                    {{ partial "admin/media.html" . }}
+                </div>
+                <div id="profile" class="content-section is-hidden">
+                    {{ partial "admin/profile.html" . }}
+                </div>
+                <div id="settings" class="content-section is-hidden">
+                    {{ partial "admin/settings.html" . }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Post Modal -->
+<div class="modal" id="newPostModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Nuevo Artículo</p>
+            <button class="delete" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+            <div class="field">
+                <label class="label">Título</label>
+                <div class="control">
+                    <input class="input" type="text" id="postTitle" placeholder="Título del artículo">
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Categorías</label>
+                <div class="control">
+                    <input class="input" type="text" id="postTags" placeholder="Separadas por comas">
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Descripción</label>
+                <div class="control">
+                    <textarea class="textarea" id="postDescription" placeholder="Breve descripción"></textarea>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="control">
+                    <label class="checkbox">
+                        <input type="checkbox" id="isDraft">
+                        Guardar como borrador
+                    </label>
+                </div>
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-primary" onclick="createPost()">Crear Artículo</button>
+            <button class="button" onclick="closeModal()">Cancelar</button>
+        </footer>
+    </div>
+</div>
+
+<style>
+.admin-dashboard {
+    padding-top: 2rem;
+}
+
+.menu-label {
+    color: #7a7a7a;
+    font-size: 0.9em;
+    letter-spacing: 0.1em;
+    margin-top: 2rem;
+}
+
+.menu-list a {
+    border-radius: 6px;
+    padding: 0.75rem;
+    transition: var(--transition);
+}
+
+.menu-list a:hover {
+    background-color: #f5f5f5;
+}
+
+.menu-list a.is-active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.box {
+    transition: var(--transition);
+}
+
+.box:hover {
+    box-shadow: var(--card-shadow);
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.textarea {
+    min-height: 150px;
+}
+
+@media screen and (max-width: 768px) {
+    .admin-dashboard {
+        padding-top: 1rem;
+    }
+}
+
+.content-section {
+    transition: opacity 0.3s ease;
+}
+
+.content-section.is-hidden {
+    display: none;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Modal functionality
+    const modal = document.getElementById('newPostModal');
+    const btn = document.getElementById('newPostBtn');
+    const closeBtn = document.querySelector('.delete');
+    
+    if (btn) btn.onclick = () => modal.classList.add('is-active');
+    if (closeBtn) closeBtn.onclick = () => modal.classList.remove('is-active');
+
+    // Cargar sección activa
+    const hash = window.location.hash.slice(1) || 'posts';
+    const sections = document.querySelectorAll('.content-section');
+    const menuItems = document.querySelectorAll('.menu-list a');
+
+    sections.forEach(section => {
+        section.classList.add('is-hidden');
+        if (section.id === hash) {
+            section.classList.remove('is-hidden');
+        }
+    });
+
+    menuItems.forEach(item => {
+        item.classList.remove('is-active');
+        if (item.getAttribute('href') === `#${hash}`) {
+            item.classList.add('is-active');
+        }
+    });
+
+    // Manejar cambios de sección
+    menuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            const targetId = item.getAttribute('href').slice(1);
+            
+            menuItems.forEach(mi => mi.classList.remove('is-active'));
+            item.classList.add('is-active');
+
+            sections.forEach(section => {
+                section.classList.toggle('is-hidden', section.id !== targetId);
+            });
+        });
+    });
+});
+
+function closeModal() {
+    const modal = document.getElementById('newPostModal');
+    if (modal) modal.classList.remove('is-active');
+}
+
+function createPost() {
+    const title = document.getElementById('postTitle').value;
+    const tags = document.getElementById('postTags').value;
+    const description = document.getElementById('postDescription').value;
+    const isDraft = document.getElementById('isDraft').checked;
+    
+    if (!title) {
+        alert('Por favor ingresa un título para el artículo');
+        return;
+    }
+    
+    const slug = slugify(title);
+    const content = `${description}\n\n<!-- more -->\n\nEscribe tu contenido aquí...`;
+    
+    fetch(`${window.adminConfig.apiEndpoint}/posts`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({
+            title: title,
+            slug: slug,
+            tags: tags.split(',').map(t => t.trim()),
+            content: content,
+            draft: isDraft
+        })
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Error al crear el post');
+        return response.json();
+    })
+    .then(data => {
+        alert('Post creado exitosamente');
+        window.location.href = `/admin/editor/${data.path}`;
+    })
+    .catch(error => {
+        alert('Error: ' + error.message);
+    });
+    
+    closeModal();
+}
+
+function slugify(text) {
+    return text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+}
+</script>
+{{ end }} 

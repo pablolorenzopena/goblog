@@ -1,0 +1,39 @@
+enabled: true
+base_url: "/admin"
+api_endpoint: "http://localhost:8080/api"
+features:
+  editor: true
+  media_library: true
+  drafts: true
+  categories: true
+  tags: true
+  ideas: true
+  settings: true
+
+menu_items:
+  - name: "Artículos"
+    id: "posts"
+    icon: "fas fa-file-alt"
+  - name: "Borradores"
+    id: "drafts"
+    icon: "fas fa-file"
+  - name: "Ideas"
+    id: "ideas"
+    icon: "fas fa-lightbulb"
+  - name: "Categorías"
+    id: "categories"
+    icon: "fas fa-tags"
+  - name: "Multimedia"
+    id: "media"
+    icon: "fas fa-images"
+  - name: "Perfil"
+    id: "profile"
+    icon: "fas fa-user"
+  - name: "Ajustes"
+    id: "settings"
+    icon: "fas fa-cog"
+
+security:
+  require_auth: true
+  session_timeout: 3600
+  allowed_roles: ["admin", "editor"] 

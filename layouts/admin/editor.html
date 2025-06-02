@@ -1,0 +1,251 @@
+{{ define "main" }}
+<div class="section editor-page">
+    <div class="container is-fluid">
+        <nav class="level mb-6">
+            <div class="level-left">
+                <div class="level-item">
+                    <h1 class="title">{{ if .Draft }}Borrador: {{ end }}{{ .Title }}</h1>
+                </div>
+            </div>
+            <div class="level-right">
+                <div class="level-item">
+                    <div class="buttons">
+                        <button class="button is-light" onclick="window.history.back()">
+                            <span class="icon"><i class="fas fa-arrow-left"></i></span>
+                            <span>Volver</span>
+                        </button>
+                        <button class="button is-info" onclick="saveAsDraft()">
+                            <span class="icon"><i class="fas fa-save"></i></span>
+                            <span>Guardar Borrador</span>
+                        </button>
+                        <button class="button is-primary" onclick="publishPost()">
+                            <span class="icon"><i class="fas fa-paper-plane"></i></span>
+                            <span>Publicar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="columns">
+            <!-- Editor Column -->
+            <div class="column is-6">
+                <div class="box">
+                    <!-- Metadata Fields -->
+                    <div class="field">
+                        <label class="label">Título</label>
+                        <div class="control">
+                            <input class="input" type="text" id="postTitle" value="{{ .Title }}">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">URL Amigable</label>
+                        <div class="control">
+                            <input class="input" type="text" id="postSlug" value="{{ .Params.slug }}">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Categorías</label>
+                        <div class="control">
+                            <input class="input" type="text" id="postTags" value="{{ delimit .Params.tags ", " }}">
+                        </div>
+                        <p class="help">Separadas por comas</p>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Imagen Destacada</label>
+                        <div class="control">
+                            <input class="input" type="text" id="featureImage" value="{{ .Params.featureImage }}">
+                        </div>
+                    </div>
+
+                    <!-- Markdown Editor -->
+                    <div class="field">
+                        <label class="label">Contenido</label>
+                        <div class="control">
+                            <div class="editor-toolbar">
+                                <button class="button is-small" onclick="insertMarkdown('**', '**')" title="Negrita">
+                                    <span class="icon"><i class="fas fa-bold"></i></span>
+                                </button>
+                                <button class="button is-small" onclick="insertMarkdown('*', '*')" title="Cursiva">
+                                    <span class="icon"><i class="fas fa-italic"></i></span>
+                                </button>
+                                <button class="button is-small" onclick="insertMarkdown('### ', '')" title="Encabezado">
+                                    <span class="icon"><i class="fas fa-heading"></i></span>
+                                </button>
+                                <button class="button is-small" onclick="insertMarkdown('- ', '')" title="Lista">
+                                    <span class="icon"><i class="fas fa-list"></i></span>
+                                </button>
+                                <button class="button is-small" onclick="insertMarkdown('[', '](url)')" title="Enlace">
+                                    <span class="icon"><i class="fas fa-link"></i></span>
+                                </button>
+                                <button class="button is-small" onclick="insertMarkdown('![alt](', ')')" title="Imagen">
+                                    <span class="icon"><i class="fas fa-image"></i></span>
+                                </button>
+                                <button class="button is-small" onclick="insertMarkdown('```\n', '\n```')" title="Código">
+                                    <span class="icon"><i class="fas fa-code"></i></span>
+                                </button>
+                            </div>
+                            <textarea class="textarea" id="editor" oninput="updatePreview()">{{ .Content }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Column -->
+            <div class="column is-6">
+                <div class="box content preview-box" id="preview">
+                    <!-- Preview content will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.editor-page {
+    min-height: calc(100vh - 3.25rem);
+    padding-top: 2rem;
+}
+
+.editor-toolbar {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    background: #f5f5f5;
+}
+
+.editor-toolbar .button {
+    margin-right: 0.5rem;
+}
+
+.textarea#editor {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+    min-height: 500px;
+    line-height: 1.5;
+    tab-size: 4;
+}
+
+.preview-box {
+    min-height: 500px;
+    max-height: 800px;
+    overflow-y: auto;
+}
+
+/* Markdown Preview Styles */
+.preview-box h1 { font-size: 2em; margin-bottom: 1em; }
+.preview-box h2 { font-size: 1.5em; margin: 1em 0; }
+.preview-box h3 { font-size: 1.25em; margin: 1em 0; }
+.preview-box p { margin-bottom: 1em; }
+.preview-box ul { margin-left: 2em; margin-bottom: 1em; }
+.preview-box code { background: #f5f5f5; padding: 0.2em 0.4em; border-radius: 3px; }
+.preview-box pre { background: #f5f5f5; padding: 1em; border-radius: 4px; overflow-x: auto; }
+.preview-box img { max-width: 100%; height: auto; }
+</style>
+
+<!-- Include marked.js for Markdown parsing -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script>
+// Configure marked options
+marked.setOptions({
+    breaks: true,
+    gfm: true,
+    headerIds: true,
+    sanitize: false
+});
+
+function updatePreview() {
+    const content = document.getElementById('editor').value;
+    const preview = document.getElementById('preview');
+    preview.innerHTML = marked(content);
+}
+
+function insertMarkdown(prefix, suffix) {
+    const editor = document.getElementById('editor');
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    const text = editor.value;
+    const before = text.substring(0, start);
+    const selection = text.substring(start, end);
+    const after = text.substring(end);
+    
+    editor.value = before + prefix + selection + suffix + after;
+    editor.focus();
+    editor.selectionStart = start + prefix.length;
+    editor.selectionEnd = end + prefix.length;
+    
+    updatePreview();
+}
+
+async function saveAsDraft() {
+    const postData = getPostData();
+    postData.draft = true;
+    await savePost(postData);
+}
+
+async function publishPost() {
+    const postData = getPostData();
+    postData.draft = false;
+    await savePost(postData);
+}
+
+async function savePost(postData) {
+    try {
+        const response = await fetch('http://localhost:8080/api/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al guardar el post');
+        }
+
+        const result = await response.json();
+        alert('Post guardado exitosamente');
+        window.location.href = '/admin';
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+function getPostData() {
+    const title = document.getElementById('postTitle').value;
+    const slug = document.getElementById('postSlug').value || slugify(title);
+    
+    return {
+        title: title,
+        slug: slug,
+        tags: document.getElementById('postTags').value.split(',').map(t => t.trim()),
+        featureImage: document.getElementById('featureImage').value,
+        content: document.getElementById('editor').value
+    };
+}
+
+function slugify(text) {
+    return text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+}
+
+// Auto-generar slug cuando se escribe el título
+document.getElementById('postTitle').addEventListener('input', function(e) {
+    const slugInput = document.getElementById('postSlug');
+    if (!slugInput.value) {
+        slugInput.value = slugify(e.target.value);
+    }
+});
+
+// Initialize preview on load
+document.addEventListener('DOMContentLoaded', updatePreview);
+</script>
+{{ end }} 

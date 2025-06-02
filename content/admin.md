@@ -1,0 +1,4 @@
+---
+title: "Administración"
+layout: "admin"
+--- 

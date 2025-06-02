@@ -1,0 +1,33 @@
+<div class="box">
+    <h3 class="title is-4">Configuración del Blog</h3>
+    <div class="field">
+        <label class="label">Título del Blog</label>
+        <div class="control">
+            <input class="input" type="text" id="blogTitle" value="{{ .Site.Title }}">
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">Descripción</label>
+        <div class="control">
+            <textarea class="textarea" id="blogDescription">{{ .Site.Params.description }}</textarea>
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">URL Base</label>
+        <div class="control">
+            <input class="input" type="text" id="baseURL" value="{{ .Site.BaseURL }}">
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">Idioma</label>
+        <div class="control">
+            <div class="select">
+                <select id="languageCode">
+                    <option value="es-es" {{ if eq .Site.LanguageCode "es-es" }}selected{{ end }}>Español</option>
+                    <option value="en-us" {{ if eq .Site.LanguageCode "en-us" }}selected{{ end }}>English</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <button class="button is-primary" onclick="saveSettings()">Guardar Configuración</button>
+</div> 

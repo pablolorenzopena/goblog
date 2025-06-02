@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    volumes:
+      - ./content:/app/content
+    ports:
+      - "8080:8080"
+
+  hugo:
+    build:
+      context: .
+      dockerfile: Dockerfile.hugo
+    volumes:
+      - ./:/site
+    ports:
+      - "1313:1313"
+    depends_on:
+      - api 

@@ -1,0 +1,145 @@
+{{ define "main" }}
+<section class="hero is-fullheight">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-4">
+                    <div class="box">
+                        <h1 class="title has-text-centered">{{ .Title }}</h1>
+                        
+                        <div class="field">
+                            <label class="label">Usuario</label>
+                            <div class="control has-icons-left">
+                                <input class="input" type="text" id="username" placeholder="Tu nombre de usuario">
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="label">Contraseña</label>
+                            <div class="control has-icons-left">
+                                <input class="input" type="password" id="password" placeholder="Tu contraseña">
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <div class="control">
+                                <button class="button is-primary is-fullwidth" onclick="login()">
+                                    <span class="icon">
+                                        <i class="fas fa-sign-in-alt"></i>
+                                    </span>
+                                    <span>Iniciar Sesión</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="errorMessage" class="notification is-danger is-light" style="display: none;">
+                            Usuario o contraseña incorrectos
+                        </div>
+                    </div>
+
+                    <p class="has-text-centered mt-4">
+                        <a href="/" class="has-text-grey">
+                            <span class="icon">
+                                <i class="fas fa-home"></i>
+                            </span>
+                            <span>Volver al Blog</span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    /* Si ya hay un token, redirigir al panel */
+    const token = localStorage.getItem('adminToken');
+    if (token) {
+        window.location.href = '/admin';
+    }
+
+    /* Manejar enter en los campos */
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    });
+});
+
+function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const errorMessage = document.getElementById('errorMessage');
+
+    if (!username || !password) {
+        errorMessage.textContent = 'Por favor completa todos los campos';
+        errorMessage.style.display = 'block';
+        return;
+    }
+
+    /* Verificar contra las credenciales por defecto */
+    const adminConfig = JSON.parse(document.body.getAttribute('data-admin-config') || '{}');
+    const defaultCredentials = adminConfig?.security?.default_credentials || {
+        username: 'admin',
+        password: 'admin123'
+    };
+
+    if (username === defaultCredentials.username && password === defaultCredentials.password) {
+        /* Generar un token simple (en producción usar JWT o similar) */
+        const token = btoa(username + ':' + new Date().getTime());
+        localStorage.setItem('adminToken', token);
+        window.location.href = '/admin';
+    } else {
+        errorMessage.textContent = 'Credenciales inválidas';
+        errorMessage.style.display = 'block';
+    }
+}
+</script>
+
+<style>
+.hero-body {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+}
+
+.box {
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+}
+
+.input {
+    transition: var(--transition);
+}
+
+.input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.125em rgba(108, 92, 231, 0.25);
+}
+
+.button {
+    transition: var(--transition);
+}
+
+.button.is-primary {
+    background-color: var(--primary-color);
+}
+
+.button.is-primary:hover {
+    background-color: var(--accent-color);
+}
+
+.notification {
+    transition: var(--transition);
+    margin-top: 1rem;
+}
+</style>
+{{ end }} 

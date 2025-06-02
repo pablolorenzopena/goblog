@@ -1,0 +1,22 @@
+<div class="box">
+    <h3 class="title is-4">Perfil de Usuario</h3>
+    <div class="field">
+        <label class="label">Nombre</label>
+        <div class="control">
+            <input class="input" type="text" id="profileName" value="{{ .Site.Params.author }}">
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">Email</label>
+        <div class="control">
+            <input class="input" type="email" id="profileEmail" value="{{ .Site.Params.email }}">
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">Biografía</label>
+        <div class="control">
+            <textarea class="textarea" id="profileBio">{{ .Site.Params.bio }}</textarea>
+        </div>
+    </div>
+    <button class="button is-primary" onclick="saveProfile()">Guardar Cambios</button>
+</div> 
